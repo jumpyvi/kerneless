@@ -10,47 +10,39 @@ Feel free to use the code in this repo in any ways you wish
 
 ## Available kernels:
 
-Zram and modules loading does not work right now, add `systemd.zram=0` to systemd-boot for now.
-
 ### Ubuntu LTS
-> Status: Boot, no zram, still usable
+The latest LTS Ubuntu kernel, tested and relied upon by thousand of users.
 
-The latest LTS Ubuntu kernel.
+>Right now this is on the pre-release of Resolute Racoon, it will follow the current LTS release when Resolute is released.
 
 https://ubuntu.com/kernel
 
-Right now this is on the pre-release of Resolute Racoon, it will follow the current LTS release when Resolute is released.
+
 
 ----------
 
-### Bazzite GitHub rolling kernel
-> Works
+### Bazzite rolling kernel
 
-The rolling Bazzite kernel
+The latest Bazzite kernel, used in the popular Bazzite operating system. Optimized for gaming devices.
 
 https://github.com/bazzite-org/kernel-bazzite
-
-Follows the latest released kernel in their GitHub
 
 ------
 
 ### Cachy LTS
-> Status: Works </br>
 
-The latest LTS CachyOS kernel.
+The latest LTS CachyOS kernel, designed for improved performance.
+No utils, just the kernel, modules and headers
 
 https://github.com/CachyOS/linux-cachyos
-
-Follows the latest LTS CachyOS kernel avaible in their repos
-
-It does not come with any of the Cachy services, tools or utils, just the barebone kernel.
 
 -----
 
 ### Surface Rolling
-> Status: Works in VM, not tested on surface
+> 🧪 Works in qemu, not tested on a real Surface
 
-The latest Surface kernel for GitHub
+The latest Surface kernel for GitHub, includes patches for Microsoft Surfaces.
+Does not support arm or nvidia
 
 https://github.com/linux-surface/linux-surface
 
@@ -59,9 +51,9 @@ Follows the latest surface kernel available on GitHub for Arch
 ---
 
 ### XanMod LTS (v3)
-> Status: Works
 
-The LTS XanMod kernel.
+The LTS XanMod kernel, built to provide a stable, smooth and solid system experience.
+Notably Includes `sched_ext` and `binder_linux`
 
 https://xanmod.org/
 
