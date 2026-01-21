@@ -10,6 +10,8 @@ Feel free to use the code in this repo in any ways you wish
 
 ## Available kernels:
 
+Zram and modules loading does not work right now, add `systemd.zram=0` to systemd-boot for now.
+
 ### Ubuntu LTS
 > Status: Boot, no zram, still usable
 
@@ -18,8 +20,6 @@ The latest LTS Ubuntu kernel.
 https://ubuntu.com/kernel
 
 Right now this is on the pre-release of Resolute Racoon, it will follow the current LTS release when Resolute is released.
-
-Zram does not work right now, add `systemd.zram=0` to systemd-boot for now.
 
 ----------
 
@@ -35,8 +35,7 @@ Follows the latest released kernel in their GitHub
 ------
 
 ### Cachy LTS
-> Status: Works, sometime crashes on user setup, still usable </br>
-> Not completed, hardcoded on 6.12.66-2 for now
+> Status: Works </br>
 
 The latest LTS CachyOS kernel.
 
