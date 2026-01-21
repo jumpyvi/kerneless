@@ -72,5 +72,9 @@ cat "${NEW_INITRAMFS_BLOCK_FILE}.zst" >> "${TARGET_INITRAMFS}"
 # Copy the vmlinuz
 cp -v "${SOURCE_VMLINUZ}" "${TARGET_VMLINUZ}"
 
+# Modules handling
+cp -av "${SOURCE_MODULES}/." "/usr/lib/modules/${K_VERSION}/"
+depmod -a "${K_VERSION}" -b /
+
 # Remove old kernel
 find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d ! -name "$K_VERSION" -exec rm -rf {} +
