@@ -1,24 +1,44 @@
-FROM ubuntu:26.04 AS fetch-cachy-kernel
+FROM alpine:edge AS fetch-cachy-kernel
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     wget \
     zstd \
     tar \
-    ca-certificates
+    ca-certificates \
+    curl \
+    wget
 
 ENV BUILD_DIR=/tmp/kernel-build
 WORKDIR ${BUILD_DIR}
 
-# Static url for now
-ENV KERNEL_URL=https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-v4/linux-cachyos-lts-6.12.66-2-x86_64_v4.pkg.tar.zst
-ENV HEADERS_URL=https://cdn77.cachyos.org/repo/x86_64_v4/cachyos-v4/linux-cachyos-lts-headers-6.12.66-2-x86_64_v4.pkg.tar.zst
+RUN KERNEL_URL="$(curl -fsSL https://mirror.cachyos.org/repo/x86_64_v3/cachyos-v3/ \
+    | grep -oE 'linux-cachyos-lts-[^"]*x86_64_v3\.pkg\.tar\.zst' \
+    | grep -Ev '(lto|headers|nvidia|zfs)' \
+    | head -n1 \
+    | sed 's|^|https://mirror.cachyos.org/repo/x86_64_v3/cachyos-v3/|')" \
+    && test -n "$KERNEL_URL" \
+    && echo "KERNEL_URL=${KERNEL_URL}" >> /etc/environment
 
-RUN wget ${KERNEL_URL} && \
-    wget ${HEADERS_URL}
+RUN HEADERS_URL="$(curl -fsSL https://mirror.cachyos.org/repo/x86_64_v3/cachyos-v3/ \
+    | grep -oE 'linux-cachyos-lts-headers-[^"]*x86_64_v3\.pkg\.tar\.zst' \
+    | grep -Ev '(lto|nvidia|zfs)' \
+    | head -n1 \
+    | sed 's|^|https://mirror.cachyos.org/repo/x86_64_v3/cachyos-v3/|')" \
+    && test -n "$HEADERS_URL" \
+    && echo "HEADERS_URL=${HEADERS_URL}" >> /etc/environment
 
-RUN mkdir -p extracted && \
-    tar -I zstd -xvf linux-cachyos-lts-6.12.66-2-x86_64_v4.pkg.tar.zst -C extracted --no-same-owner && \
-    tar -I zstd -xvf linux-cachyos-lts-headers-6.12.66-2-x86_64_v4.pkg.tar.zst -C extracted --no-same-owner
+ENV KERNEL_URL=${KERNEL_URL}
+ENV HEADERS_URL=${HEADERS_URL}
+
+RUN set -eux; \
+    . /etc/environment; \
+    wget -q "$KERNEL_URL" "$HEADERS_URL"
+
+RUN set -eux; \
+    . /etc/environment; \
+    mkdir -p extracted; \
+    tar -I zstd -xf "$(basename "$KERNEL_URL")" -C extracted --no-same-owner; \
+    tar -I zstd -xf "$(basename "$HEADERS_URL")" -C extracted --no-same-owner
 
 WORKDIR /system_files/kernel
 RUN mkdir -p boot lib/modules usr/src
