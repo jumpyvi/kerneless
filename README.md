@@ -48,6 +48,17 @@ It does not come with any of the Cachy services, tools or utils, just the barebo
 
 -----
 
+### Surface Rolling
+> Status: Works
+
+The latest Surface kernel for GitHub
+
+https://xanmod.org/
+
+Follows the latest LTS XanMod kernel available on Ubuntu LTS
+
+---
+
 ### XanMod LTS (v3)
 > Status: Works
 
@@ -59,24 +70,7 @@ Follows the latest LTS XanMod kernel available on Ubuntu LTS
 
 ---
 
-### CentOS LTS
-> Status: WIP, does not boot missing all modules
-
-https://www.centos.org/
-
-Modules do not work for now, so it cannot boot.
-Check back soon!
-
----
-
-### Alpine Edge LTS
-> Status: Boot, but no networking in qemu/virtio
-
-https://www.alpinelinux.org/
-
-The alpine linux edge LTS kernel
-
-For fun only, not recommanded
+Experimentals kernels from [Alpine](kernels/experimentals/alpine-kernel.dockerfile) and [Centos](kernels/experimentals/WIP.centos-kernel.dockerfile) are also available, but are not maintained and have severe issues.
 
 ## Setup
 > [!NOTE]
