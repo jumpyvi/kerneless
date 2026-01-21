@@ -49,13 +49,13 @@ It does not come with any of the Cachy services, tools or utils, just the barebo
 -----
 
 ### Surface Rolling
-> Status: Works
+> Status: Works in VM, not tested on surface
 
 The latest Surface kernel for GitHub
 
-https://xanmod.org/
+https://github.com/linux-surface/linux-surface
 
-Follows the latest LTS XanMod kernel available on Ubuntu LTS
+Follows the latest surface kernel available on GitHub for Arch
 
 ---
 
