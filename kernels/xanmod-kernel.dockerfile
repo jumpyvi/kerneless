@@ -1,4 +1,5 @@
 FROM ubuntu:26.04 AS fetch-xanmod-kernel
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
@@ -16,7 +17,7 @@ ENV BUILD_DIR=/tmp/kernel-build
 WORKDIR ${BUILD_DIR}
 
 RUN install -m 0755 -d /etc/apt/keyrings && \
-    wget -qO - https://dl.xanmod.org/archive.key | gpg --dearmor -vo /etc/apt/keyrings/xanmod-archive-keyring.gpg
+    wget -qO - https://dl.xanmod.org/archive.key | gpg --dearmor --yes -o /etc/apt/keyrings/xanmod-archive-keyring.gpg
 
 RUN cat <<EOF | tee /etc/apt/sources.list.d/xanmod.sources
 Types: deb
@@ -62,7 +63,7 @@ RUN KABI=$(basename $(ls lib/modules)) && \
 RUN --mount=type=bind,source=./scripts/setup-kernel.sh,target=/tmp/setup-kernel.sh \
     install -m 0755 /tmp/setup-kernel.sh /system_files/kernel/setup-kernel.sh
 
-FROM scratch as xanmod-kernel
+FROM scratch AS xanmod-kernel
 
 COPY --from=fetch-xanmod-kernel /system_files /system_files
 COPY --from=fetch-xanmod-kernel /kernel.abi /kernel.abi

@@ -1,10 +1,94 @@
-name: Build Bootable Images
+# This is based on Ublue's workflow for building bootable images, licensed under the Apache-2.0 license
+# https://github.com/ublue-os/image-template
 
+
+name: Build Bootable Images
 on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '05 10 * * *'
   push:
-    branches: [ "main", "workflow" ]
+    branches: [main, "workflow"]
+    paths-ignore:
+      - '**/README.md'
   workflow_dispatch:
 
+env:
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
+  DEFAULT_TAG: "latest"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build_push:
+    name: Build and push image
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        kernel_flavor: [bazzite, cachy, ubuntu, xanmod, surface]
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: |
+          # Lowercase the registry and set the specific image name for this matrix leg
+          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
+          echo "SPECIFIC_IMAGE_NAME=kerneless-${{ matrix.kernel_flavor }}" >> ${GITHUB_ENV}
+
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@v7
+
+      - name: Mount BTRFS for podman storage
+        uses: ublue-os/container-storage-action@v1
+
+      - name: Image Metadata
+        uses: docker/metadata-action@v5
+        id: metadata
+        with:
+          images: ${{ env.IMAGE_REGISTRY }}/${{ env.SPECIFIC_IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ env.DEFAULT_TAG }}
+            type=raw,value={{date 'YYYYMMDD'}}
+          labels: |
+            containers.bootc=1
+            org.opencontainers.image.title=${{ env.SPECIFIC_IMAGE_NAME }}
+
+      - name: Build Image (Buildah)
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: ./kerneless.Containerfile
+          image: ${{ env.SPECIFIC_IMAGE_NAME }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          build-args: |
+            KERNEL=${{ matrix.kernel_flavor }}
+            KERNEL_IMAGE_BASE=${{ env.IMAGE_REGISTRY }}/kerneless
+          oci: true
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push To GHCR
+        if: github.event_name != 'pull_request'
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          image: ${{ env.SPECIFIC_IMAGE_NAME }}
+          tags: ${{ steps.metadata.outputs.tags }}
