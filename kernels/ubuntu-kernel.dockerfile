@@ -1,5 +1,7 @@
 FROM ubuntu:26.04 AS fetch-ubuntu-kernel
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
     wget \
     zstd \
@@ -7,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     binutils
 
 ENV BUILD_DIR=/tmp/kernel-build
-ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR ${BUILD_DIR}
 
