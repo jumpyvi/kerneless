@@ -1,0 +1,10 @@
+name: Build Bootable Images
+
+on:
+  push:
+    branches: [ "main", "workflow" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
