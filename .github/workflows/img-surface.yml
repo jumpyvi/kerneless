@@ -1,6 +1,6 @@
 
 ## This is code from https://github.com/ublue-os/image-template, modified for my usage, licensed under Apache-2.0 ##
-name: Build container image
+name: Build surface image
 on:
   pull_request:
     branches:
