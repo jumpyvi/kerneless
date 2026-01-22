@@ -1,26 +1,26 @@
-
-## This is code from https://github.com/ublue-os/image-template, modified for my usage, licensed under Apache-2.0 ##
-name: Build ubuntu image
+# From https://github.com/projectbluefin/dakota
+---
+name: (Ubuntu) Build container image
 on:
   pull_request:
     branches:
       - main
       - workflow
   schedule:
-    - cron: '0 0 1,15 * *'
+    - cron: '0 0 3,17 * *'
   push:
     branches:
       - main
     paths-ignore:
-      - '**/README.md'
+      - "**/README.md"
   workflow_dispatch:
 
 env:
   IMAGE_DESC: "Dakota image with the Ubuntu kernel"
-  IMAGE_KEYWORDS: "bootc,ublue,universal-blue,dakota,kernel"
-  IMAGE_LOGO_URL: "https://avatars.githubusercontent.com/u/136393846?s=48&v=4"  # Put your own image here for a fancy profile on https://artifacthub.io/!
-  IMAGE_NAME: "kerneless-ubuntu"  # output image name, usually same as repo name
-  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
+  IMAGE_KEYWORDS: "bootc,centos"
+  IMAGE_LOGO_URL: "https://avatars.githubusercontent.com/u/136393846?s=200&v=4"
+  IMAGE_NAME: "kerneless-ubuntu"
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
   DEFAULT_TAG: "latest"
 
 concurrency:
@@ -38,31 +38,10 @@ jobs:
       id-token: write
 
     steps:
-      - name: Prepare environment
-        run: |
-          # Lowercase the image uri
-          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
-          echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
-
-      # These stage versions are pinned by https://github.com/renovatebot/renovate
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-
-      # You only use this action if the container-storage-action proves to be unreliable, you don't need to enable both
-      # This is optional, but if you see that your builds are way too big for the runners, you can enable this by uncommenting the following lines:
-      - name: Maximize build space
-        uses: ublue-os/remove-unwanted-software@695eb75bc387dbcd9685a8e72d23439d8686cba6
-
-      - name: Mount BTRFS for podman storage
-        id: container-storage-action
-        uses: ublue-os/container-storage-action@911baca08baf30c8654933e9e9723cb399892140
-
-        # Fallback to the remove-unwanted-software-action if github doesn't allocate enough space
-        # See: https://github.com/ublue-os/container-storage-action/pull/11
-        continue-on-error: true 
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v5
         with:
-          target-dir: /var/lib/containers
-          mount-opts: compress-force=zstd:2
+          submodules: recursive
 
       - name: Get current date
         id: date
@@ -73,14 +52,10 @@ jobs:
           # https://linux.die.net/man/1/date
           echo "date=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)" >> $GITHUB_OUTPUT
 
-      # Image metadata for https://artifacthub.io/ - This is optional but is highly recommended so we all can get a index of all the custom images
-      # The metadata by itself is not going to do anything, you choose if you want your image to be on ArtifactHub or not.
       - name: Image Metadata
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         id: metadata
         with:
-          # This generates all the tags for your image, you can add custom tags here too!
-          # Default tags are "$DEFAULT_TAG" and "$DEFAULT_TAG.$date".
           tags: |
             type=raw,value=${{ env.DEFAULT_TAG }}
             type=raw,value=${{ env.DEFAULT_TAG }}.{{date 'YYYYMMDD'}}
@@ -106,18 +81,41 @@ jobs:
           sep-tags: " "
           sep-annotations: " "
 
+      - name: Mount BTRFS for podman storage
+        id: container-storage-action
+        uses: ublue-os/container-storage-action@911baca08baf30c8654933e9e9723cb399892140
+        with:
+          mount-opts: noatime,compress-force=zstd:2
+
+      - name: Mount BTRFS for /var/tmp
+        id: var-tmp-action
+        uses: ublue-os/container-storage-action@911baca08baf30c8654933e9e9723cb399892140
+        with:
+          mount-opts: noatime,compress-force=zstd:2
+          target-dir: /var/tmp
+
       - name: Build Image
         id: build_image
-        uses: redhat-actions/buildah-build@7a95fa7ee0f02d552a32753e7414641a04307056 # v2
-        with:
-          containerfiles: |
-            ./kerneless.Containerfile
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
-          oci: false
-          build-args: |
-            KERNEL=ubuntu
+        env:
+          META_LABELS: ${{ steps.metadata.outputs.labels }}
+          META_TAGS: ${{ steps.metadata.outputs.tags }}
+        run: |
+          set -x
+          BUILD_ARGS=("--squash-all" "--build-arg" "KERNEL=ubuntu")
+
+          # get tags from metadata action
+          for tag in $META_TAGS; do
+            BUILD_ARGS+=("--tag" "$IMAGE_NAME:$tag")
+          done
+
+          # get labels from metadata action
+          while IFS= read -r label; do
+          if [[ -n "$label" ]]; then
+            BUILD_ARGS+=("--label" "$label")
+          fi
+          done <<< "$META_LABELS"
+
+          podman build "${BUILD_ARGS[@]}" .
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
@@ -144,8 +142,6 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        with:
-          cosign-release: 'v2.6.1'
 
       - name: Sign container image
         if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
