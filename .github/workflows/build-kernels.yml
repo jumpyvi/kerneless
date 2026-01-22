@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kernel: [bazzite, cachy, ubuntu, xanmod, surface]
+        kernel: [bazzite, cachy, ubuntu, surface]
 
     steps:
       - name: Checkout repository
