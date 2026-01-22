@@ -1,10 +1,9 @@
 ARG KERNEL
 
 FROM scratch AS ctx
-COPY build_files /
-COPY --from=localhost/xanmod-kernel:latest /system_files/kernel /files/system_files/kernel
+COPY --from=ghcr.io/jumpyvi/kerneless:${KERNEL} /system_files/kernel /files/system_files/kernel
 
-FROM ghcr.io/jumpyvi/kerneless:${KERNEL}
+FROM ghcr.io/projectbluefin/dakota:latest
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
