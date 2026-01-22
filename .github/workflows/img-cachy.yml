@@ -101,7 +101,7 @@ jobs:
           META_TAGS: ${{ steps.metadata.outputs.tags }}
         run: |
           set -x
-          BUILD_ARGS=("--squash-all" "--build-arg" "KERNEL=cachy")
+          BUILD_ARGS=("-f" "kerneless.Containerfile" "--squash-all" "--build-arg" "KERNEL=cachy")
 
           # get tags from metadata action
           for tag in $META_TAGS; do
