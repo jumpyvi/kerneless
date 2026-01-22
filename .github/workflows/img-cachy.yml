@@ -6,7 +6,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 0 1,15 * *'
+    - cron: '0 0 3,17 * *'
   push:
     branches:
       - main
@@ -15,10 +15,10 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_DESC: "Dakota image with a custom kernel"
+  IMAGE_DESC: "Dakota image with the Cachy kernel"
   IMAGE_KEYWORDS: "bootc,ublue,universal-blue,dakota,kernel"
   IMAGE_LOGO_URL: "https://avatars.githubusercontent.com/u/136393846?s=48&v=4"  # Put your own image here for a fancy profile on https://artifacthub.io/!
-  IMAGE_NAME: "${{ github.event.repository.name }}"  # output image name, usually same as repo name
+  IMAGE_NAME: "kerneless-cachy"  # output image name, usually same as repo name
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
   DEFAULT_TAG: "latest"
 
@@ -115,6 +115,8 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           oci: false
+          build-args: |
+            KERNEL=cachy
 
 
       - name: Run Rechunker
