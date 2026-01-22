@@ -29,8 +29,8 @@ RUN KABI=$(ls ${BUILD_DIR}/extracted/usr/lib/modules/ | head -n 1) && \
 
     
 RUN KABI=$(cat /kernel.abi) && \
-    cp -v ${BUILD_DIR}/extracted/usr/lib/modules/${KABI}/vmlinuz boot/vmlinuz && \
-    cp -av ${BUILD_DIR}/extracted/usr/lib/modules/${KABI} lib/modules/
+    cp ${BUILD_DIR}/extracted/usr/lib/modules/${KABI}/vmlinuz boot/vmlinuz && \
+    cp -a ${BUILD_DIR}/extracted/usr/lib/modules/${KABI} lib/modules/
 
 RUN --mount=type=bind,source=./scripts/setup-kernel.sh,target=/tmp/setup-kernel.sh \
     install -m 0755 /tmp/setup-kernel.sh /system_files/kernel/setup-kernel.sh

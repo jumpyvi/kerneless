@@ -40,21 +40,21 @@ RUN rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN mkdir -p /tmp/kernel-build/extracted
 
 RUN ar x linux-image-*-xanmod*_amd64.deb && \
-    tar -xvf data.tar* -C /tmp/kernel-build/extracted --no-same-owner && \
+    tar -xf data.tar* -C /tmp/kernel-build/extracted --no-same-owner && \
     rm -f data.tar* control.tar.* debian-binary && \
     \
     ar x linux-headers-*-xanmod*_amd64.deb && \
-    tar -xvf data.tar* -C /tmp/kernel-build/extracted --no-same-owner && \
+    tar -xf data.tar* -C /tmp/kernel-build/extracted --no-same-owner && \
     rm -f data.tar* control.tar.* debian-binary
 
 WORKDIR /system_files/kernel
 RUN mkdir -p boot lib/modules usr/src
 
-RUN cp -v ${BUILD_DIR}/extracted/boot/vmlinuz* boot/vmlinuz && \
-    cp -v ${BUILD_DIR}/extracted/boot/config* boot/config && \
-    cp -v ${BUILD_DIR}/extracted/boot/System.map* boot/System.map && \
-    cp -av ${BUILD_DIR}/extracted/lib/modules/* lib/modules/ && \
-    cp -av ${BUILD_DIR}/extracted/usr/src/* usr/src/
+RUN cp ${BUILD_DIR}/extracted/boot/vmlinuz* boot/vmlinuz && \
+    cp ${BUILD_DIR}/extracted/boot/config* boot/config && \
+    cp ${BUILD_DIR}/extracted/boot/System.map* boot/System.map && \
+    cp -a ${BUILD_DIR}/extracted/lib/modules/* lib/modules/ && \
+    cp -a ${BUILD_DIR}/extracted/usr/src/* usr/src/
 
 RUN KABI=$(basename $(ls lib/modules)) && \
     echo "Detected kernel ABI: $KABI" && \
