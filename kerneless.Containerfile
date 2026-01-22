@@ -1,6 +1,9 @@
 ARG KERNEL
 
 FROM scratch AS ctx
+
+ARG KERNEL
+
 COPY --from=ghcr.io/jumpyvi/kerneless:${KERNEL} /system_files/kernel /files/system_files/kernel
 
 FROM ghcr.io/projectbluefin/dakota:latest
