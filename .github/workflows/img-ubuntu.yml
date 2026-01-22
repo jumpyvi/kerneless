@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - main
+      - workflow
   schedule:
     - cron: '0 0 1,15 * *'
   push:
