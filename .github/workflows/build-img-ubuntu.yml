@@ -7,6 +7,9 @@ on:
       - testing
     paths-ignore:
       - "**.md"
+  push:
+    branches:
+      - main
   schedule:
     - cron: "50 5 * * 0" # 5:50 UTC sunday
   workflow_call:
