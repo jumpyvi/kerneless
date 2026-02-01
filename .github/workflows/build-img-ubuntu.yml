@@ -18,6 +18,10 @@ on:
 jobs:
   build-image-ubuntu:
     name: Build Ubuntu Images
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     uses: ./.github/workflows/reusable-build.yml
     secrets: inherit
     strategy:
