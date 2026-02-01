@@ -86,9 +86,10 @@ jobs:
         env:
           META_LABELS: ${{ steps.metadata.outputs.labels }}
           META_TAGS: ${{ steps.metadata.outputs.tags }}
+          KERNEL_TYPE: ${{ inputs.kernel_type }}
         run: |
           set -x
-          BUILD_ARGS=("-f" "kerneless.Containerfile" "--squash-all" "--build-arg" "KERNEL=${inputs.kernel_type}")
+          BUILD_ARGS=("-f" "kerneless.Containerfile" "--squash-all" "--build-arg" "KERNEL=${KERNEL_TYPE}")
 
           # get tags from metadata action
           for tag in $META_TAGS; do
