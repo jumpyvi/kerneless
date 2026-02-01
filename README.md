@@ -39,19 +39,6 @@ https://github.com/bazzite-org/kernel-bazzite
 
 ------
 
-### Cachy LTS
-
-The latest LTS CachyOS kernel, designed for improved performance.
-No utils, just the kernel, modules and headers
-
-https://github.com/CachyOS/linux-cachyos
-
-- Kernel OCI package : `ghcr.io/jumpyvi/kerneless:cachy`
-
-- Dakota bootable image : `ghcr.io/jumpyvi/kerneless-surface:latest`
-
------
-
 ### Surface Rolling
 > 🧪 Works in qemu, not tested on a real Surface
 
@@ -68,6 +55,19 @@ Follows the latest surface kernel available on GitHub for Arch
 
 ---
 
+### Cachy LTS
+
+The latest LTS CachyOS kernel, designed for improved performance.
+No utils, just the kernel, modules and headers
+
+https://github.com/CachyOS/linux-cachyos
+
+- Kernel OCI package : `ghcr.io/jumpyvi/kerneless:cachy`
+
+- Dakota bootable image : `Not planned`
+
+-----
+
 ### XanMod LTS (v3)
 
 The LTS XanMod kernel, built to provide a stable, smooth and solid system experience.
@@ -79,7 +79,7 @@ Follows the latest LTS XanMod kernel available on Ubuntu LTS
 
 - Kernel OCI package : `comming soon...`
 
-- Dakota bootable image : `comming soon...`
+- Dakota bootable image : `Not planned`
 
 ---
 
@@ -92,6 +92,7 @@ None of these kernels are what you want? Feel free to open an issue, or send a P
 ## Setup
 
 ### (Option 1) Bootc switch to pre-built images
+> This option is only available for Ubuntu, Surface and Bazzite
 
 1. Install Dakota on your system
 2. `sudo bootc switch ghcr.io/jumpyvi/kerneless-{kernel-name}:latest`
@@ -118,7 +119,7 @@ RUN /ctx/files/system_files/kernel/setup-kernel.sh
 ```
 FROM scratch AS ctx
 COPY build_files /
-COPY --from=ghcr.io/jumpyvi/kerneless:ubuntu /system_files/kernel /files/system_files/kernel
+COPY --from=ghcr.io/jumpyvi/kerneless:cachy /system_files/kernel /files/system_files/kernel
 
 # Base Image
 FROM ghcr.io/projectbluefin/dakota:latest

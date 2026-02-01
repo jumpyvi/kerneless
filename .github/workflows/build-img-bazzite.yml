@@ -1,0 +1,32 @@
+name: Bazzite Image Build
+on:
+  merge_group:
+  pull_request:
+    branches:
+      - main
+      - testing
+    paths-ignore:
+      - "**.md"
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "50 5 * * 0" # 5:50 UTC sunday
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-image-surface:
+    name: Build Bazzite Images
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/reusable-build.yml
+    secrets: inherit
+    strategy:
+      fail-fast: false
+      matrix:
+        brand_name: ["kerneless"]
+    with:
+      kernel_type: 'bazzite'
