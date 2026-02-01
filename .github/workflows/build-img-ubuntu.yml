@@ -1,0 +1,27 @@
+name: Ubuntu Image Build
+on:
+  merge_group:
+  pull_request:
+    branches:
+      - main
+      - testing
+    paths-ignore:
+      - "**.md"
+  schedule:
+    - cron: "50 5 * * 0" # 5:50 UTC sunday
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-image-ubuntu:
+    name: Build Ubuntu Images
+    uses: ./.github/workflows/reusable-build.yml
+    secrets: inherit
+    strategy:
+      fail-fast: false
+      matrix:
+        brand_name: ["kerneless"]
+    with:
+      brand_name: ${{ matrix.brand_name }}
+      stream_name: latest
+      image_flavors: '["ubuntu"]'
