@@ -2,11 +2,9 @@
 > [!WARNING]
 This is experimental 🦖! Only run in a test VM!
 
-Run custom kernels on ProjectBluefin's [Dakota](https://github.com/projectbluefin/dakota) based images!
+Run custom kernels on GnomeOS/FreeDesktopSDK based images!
 
 Kernels are updated every two week, images are updated weekly
-
-(Silverblue 43+ support might comme soon)
 
 This repo includes snippets of code from the [UBlue image template](https://github.com/ublue-os/image-template), licensed under Apache 2.0
 
